@@ -1,0 +1,34 @@
+version: '2'
+services:
+  app:
+    build: .
+    restart: always
+    environment:
+      VIRTUAL_HOST: ceremony.tornado.cash
+      LETSENCRYPT_HOST: ceremony.tornado.cash
+      nginx_client_max_body_size: 50m
+      nginx_proxy_read_timeout: 600s
+      MYSQL_HOST: mysql
+    env_file: .env.production
+    volumes:
+      - app:/app/server/snark_files
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    env_file: .env.production
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+    volumes:
+      - mysql:/var/lib/mysql
+
+volumes:
+  app:
+  mysql:
+
+networks:
+  default:
+    external:
+      name: frontend_default
